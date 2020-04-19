@@ -23,5 +23,5 @@
 *}
 
 <section>
-  <p>{l s='Pay with your smartphone in seconds. Only available for luxemburgisch bank accounts.' mod='paymentdigicash'}</p>
+  <p>{l s='Pay with your smartphone in seconds. Digicash is only available with luxemburgisch bank accounts.' mod='paymentdigicash'}</p>
 </section>

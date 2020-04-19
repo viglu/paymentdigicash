@@ -26,16 +26,29 @@
 {block name="content"}
   <section>
         <h2>Digicash by Payconiq</h2>
-	<p>Saviez-vous qu'avec l'App DIGICASH, vous pouvez payer votre commande sur bitzerella.com en 6 seconde sans saisir vos coordonnées bancaires? C'est plus simple et c'est sécurisé! </p>
+	<p>
+		{l s='Did you know that with the DIGICASH App, you can pay your order in seconds with your smartphone? It\'s easy and secure!' mod='paymentdigicash'}		
+	</p>
+	
+	<p>
+		<ul>
+			<li>{l s='Scan the QrCode with your DIGICASH App!' mod='paymentdigicash'}</li>		
+			<li>{l s='After you scanned the QrCode wait until the page will refresh automatically!' mod='paymentdigicash'}</li>
+		</ul>		
+	</p>
 	
 	<p class="text-center">
-		<h3>Détails de paiement</h3>
+		<h3>{l s='Payment details' mod='paymentdigicash'}:</h3>
 		<img src="data:image/jpeg;base64,{$qrCodeBase64}" /><br>
-		Déscription: <strong>{$transactionReference}</strong><br>
-	        Montant: <strong>{number_format($orderTotal, 2)} €</strong>
+		{l s='Description' mod='paymentdigicash'}: <strong>{$transactionReference}</strong><br>
+	    {l s='Amount' mod='paymentdigicash'}: <strong>{number_format($orderTotal, 2)} €</strong>
 	</p>
 
-	<p><button id="btnCancelPayment" onclick="history.back()" class="btn btn-secondary center-block">Annuler le paiement et retour à votre commande</button><p>
+	<p>
+		<button id="btnCancelPayment" onclick="history.back()" class="btn btn-secondary center-block">
+			{l s='Do not pay with Digicash, return to your order' mod='paymentdigicash'}	
+		</button>
+	</p>
   </section>
   <form action="{$validationURL}" id="validationForm">
   </form>

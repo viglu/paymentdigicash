@@ -71,19 +71,14 @@ class PaymentDigicashQrCodeModuleFrontController extends ModuleFrontController
             'transactionReference' => $transactionReference,
             'orderTotal' => $initLog->getAmount(),
             'transactionStatusURL' => $transactionStatusURL,
-            'validationURL' => $validationURL,
+            'validationURL' => $validationURL
         ]);
-        
-        
 
         $this->setTemplate('module:paymentdigicash/views/templates/front/qrcode.tpl');
     }
-    
+
     public function setMedia()
     {
         parent::setMedia();
-               
-        
-        $this->addJS(_MODULE_DIR_ . 'paymentdigicash/views/js/transactionstatus.js');
     }
 }
