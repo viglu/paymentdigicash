@@ -29,11 +29,9 @@ use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
  */
 require_once dirname(__FILE__) . '/classes/DigicashOperationLog.php';
 
-
 require_once dirname(__FILE__) . '/classes/DigicashConst.php';
 
 require_once (dirname(__FILE__) . '/install.php');
-
 
 if (! defined('_PS_VERSION_')) {
     exit();
@@ -86,11 +84,10 @@ class paymentdigicash extends PaymentModule
 
     public function install()
     {
+        $digicash_install = new DigicashInstall();
+        $digicash_install->createTables();
 
-        // $digicash_install = new DigicashInstall();
-        // $digicash_install->createTables();
         return parent::install() && $this->registerHook('paymentOptions');
- 	  /*&& !$this->registerHook('paymentReturn')*/;
     }
 
     public function uninstall()
@@ -130,9 +127,9 @@ class paymentdigicash extends PaymentModule
      */
     protected function postProcess()
     {
-        if (Tools::isSubmit('btnSubmit')) {
-            Configuration::updateValue(DigicashConst::MERCHANT_ID, Tools::getValue(self::MERCHANT_ID));
-            Configuration::updateValue(DigicashConst::URL_ALIAS, Tools::getValue(self::URL_ALIAS));
+        if (Tools::isSubmit('submitOptionsconfiguration')) {
+            Configuration::updateValue(DigicashConst::MERCHANT_ID, Tools::getValue(DigicashConst::MERCHANT_ID));
+            Configuration::updateValue(DigicashConst::URL_ALIAS, Tools::getValue(DigicashConst::URL_ALIAS));
             Configuration::updateValue(DigicashConst::DESCRIPTION_STATEMENT_PREFIX, Tools::getValue(DigicashConst::DESCRIPTION_STATEMENT_PREFIX));
         }
     }
@@ -170,7 +167,7 @@ class paymentdigicash extends PaymentModule
         $helper->title = $this->displayName;
         $helper->table = 'configuration';
         $helper->show_toolbar = false;
-        $helper->submit_action = 'btnSubmit';
+        // $helper->submit_action = 'btnSubmit';
 
         return $helper->generateOptions(array_merge($this->getGeneralOptions()));
     }
@@ -187,7 +184,7 @@ class paymentdigicash extends PaymentModule
                 'title' => $this->l('API Settings'),
                 'icon' => 'icon-server',
                 'fields' => array(
-                    self::MERCHANT_ID => array(
+                    DigicashConst::MERCHANT_ID => array(
                         'title' => $this->l('Merchant Id'),
                         'type' => 'text',
                         'name' => DigicashConst::MERCHANT_ID,
@@ -196,7 +193,7 @@ class paymentdigicash extends PaymentModule
                         'cast' => 'strval',
                         'size' => 64
                     ),
-                    self::URL_ALIAS => array(
+                    DigicashConst::URL_ALIAS => array(
                         'title' => $this->l('URL Alias'),
                         'type' => 'text',
                         'name' => DigicashConst::URL_ALIAS,
@@ -205,7 +202,7 @@ class paymentdigicash extends PaymentModule
                         'cast' => 'strval',
                         'size' => 64
                     ),
-                    self::DESCRIPTION_STATEMENT_PREFIX => array(
+                    DigicashConst::DESCRIPTION_STATEMENT_PREFIX => array(
                         'title' => $this->l('Statement prefix'),
                         'type' => 'text',
                         'name' => DigicashConst::DESCRIPTION_STATEMENT_PREFIX,

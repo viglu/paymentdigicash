@@ -30,7 +30,7 @@ class DigicashInstall
 
     public function createTables()
     {
-        if (! Db::getInstance()->Execute('
+        return Db::getInstance()->Execute('
 			CREATE TABLE IF NOT EXISTS ' . _DB_PREFIX_ . 'ps_digicash_operation_log(
 			  id int unsigned NOT NULL AUTO_INCREMENT,
 			  id_cart int unsigned NOT NULL,
@@ -46,7 +46,6 @@ class DigicashInstall
 			INDEX (id_cart),
 			INDEX (id_order)
 			) ENGINE =' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;
-		'))
-            return false;
+		');
     }
 }
