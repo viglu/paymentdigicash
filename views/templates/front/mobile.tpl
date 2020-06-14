@@ -29,20 +29,33 @@
 	<p>
 		{l s='Did you know that with the DIGICASH App, you can pay your order in seconds with your smartphone? It\'s easy and secure!' mod='paymentdigicash'}		
 	</p>
-	
-	<p>
-		<ul>
-			<li>{l s='Scan the QrCode with your DIGICASH App!' mod='paymentdigicash'}</li>		
-			<li>{l s='After you scanned the QrCode wait until the page will refresh automatically!' mod='paymentdigicash'}</li>
-		</ul>		
-	</p>
+		
 	
 	<p class="text-center">
 		<h3>{l s='Payment details' mod='paymentdigicash'}:</h3>
-		<img src="data:image/jpeg;base64,{$qrCodeBase64}" /><br>
 		{l s='Description' mod='paymentdigicash'}: <strong>{$transactionReference}</strong><br>
 	    {l s='Amount' mod='paymentdigicash'}: <strong>{number_format($orderTotal, 2)} €</strong>
+	    
+	    <p>
+		<ul>
+			<li>{l s='Please select bellow the Digicash APP which you have installed.' mod='paymentdigicash'}</li>		
+			<li>{l s='After validated your transaction in the app and you will return here and wait until the page will refresh automatically!' mod='paymentdigicash'}</li>
+		</ul>		
+		</p>
+		<h3>{l s='Select your Digicash APP' mod='paymentdigicash'}</h3>
+	    <div class="row text-md-center">
+	    {foreach from=$schemeList item=scheme}
+    	{if $scheme->testapp eq 'false'}    	
+    		<div class="col-md-4">
+        		<a href="{$mobileURL}?scheme={$scheme->scheme}"> <img src="{$scheme->logoUrl}" /></a><br />
+        		{$scheme->appName}
+        	</div>        
+		{/if}
+		{/foreach}
+		</div>
 	</p>
+	
+	<br/>
 
 	<p>
 		<button id="btnCancelPayment" onclick="history.back()" class="btn btn-secondary center-block">
@@ -79,6 +92,6 @@ function timerFunc() {
 	xhr.send();
 }
 
-var timer = setInterval(timerFunc, 2500);
+var timer = setInterval(timerFunc, 2000);
 </script>
 {/block}

@@ -1,3 +1,4 @@
+
 <?php
 
 /*
@@ -29,19 +30,24 @@ require_once dirname(__FILE__) . '/../../classes/DigicashConst.php';
  *
  * @since 1.0.0
  */
-class PaymentDigicashQrCodeModuleFrontController extends ModuleFrontController
+class PaymentDigicashDesktopModuleFrontController extends ModuleFrontController
 {
-
+    
     public function initContent()
     {
         parent::initContent();
-
+        
+        if ($this->context->isMobile()) {
+            header('Location: ' . $this->context->link->getModuleLink('paymentdigicash', 'mobile', array(), Tools::usingSecureMode()));
+            die();
+        }
+        
         $cart = $this->context->cart;
-
+        
         $operation = 'INIT';
         $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . strval($cart->id);
         $urlAlias = Configuration::get(DigicashConst::URL_ALIAS);
-
+        
         // check if there is already a init
         $initLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, $operation);
         if (empty($initLog) || empty($initLog->getTransactionReference())) {
@@ -53,19 +59,19 @@ class PaymentDigicashQrCodeModuleFrontController extends ModuleFrontController
             $initLog->setDateAdd(date("Y-m-d H:i:s"));
             $initLog->add();
         }
-
+        
         $amount = strval(intval($initLog->getAmount() * 100));
         $merchantId = Configuration::get(DigicashConst::MERCHANT_ID);
-
+        
         $qrCodeImageURL = 'https://pos.digica.sh/qrcode/generator?merchantId=' . $merchantId . '&amount=' . $amount . '&transactionReference=' . urlencode($transactionReference);
         if (! empty($urlAlias)) {
             $qrCodeImageURL .= '&urlAlias=' . $urlAlias;
         }
-
+        
         $qrCodeBase64 = base64_encode(file_get_contents($qrCodeImageURL));
         $transactionStatusURL = $this->context->link->getModuleLink('paymentdigicash', 'transactionstatus', array(), Tools::usingSecureMode());
         $validationURL = $this->context->link->getModuleLink('paymentdigicash', 'validation', array(), Tools::usingSecureMode());
-
+        
         $this->context->smarty->assign([
             'qrCodeBase64' => $qrCodeBase64,
             'transactionReference' => $transactionReference,
@@ -73,10 +79,10 @@ class PaymentDigicashQrCodeModuleFrontController extends ModuleFrontController
             'transactionStatusURL' => $transactionStatusURL,
             'validationURL' => $validationURL
         ]);
-
-        $this->setTemplate('module:paymentdigicash/views/templates/front/qrcode.tpl');
+        
+        $this->setTemplate('module:paymentdigicash/views/templates/front/desktop.tpl');
     }
-
+    
     public function setMedia()
     {
         parent::setMedia();
