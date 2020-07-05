@@ -45,7 +45,7 @@
 		<h3>{l s='Select your Digicash APP' mod='paymentdigicash'}</h3>
 	    <div class="row text-md-center">
 	    {foreach from=$schemeList item=scheme}
-    	{if $scheme->testapp eq 'false'}    	
+    	{if $scheme->testapp eq 'true'}    	
     		<div class="col-md-4">
         		<a href="{$mobileURL}?scheme={$scheme->scheme}"> <img src="{$scheme->logoUrl}" /></a><br />
         		{$scheme->appName}

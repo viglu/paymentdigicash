@@ -35,42 +35,41 @@ class PaymentDigicashCallbackModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
         header('Content-Type: text/plain');
-
         $result = 'nok internal error';
-
+        
         $operation = Tools::getValue('operation');
         $transactionReference = urldecode(Tools::getValue('transactionReference'));
         $transactionId = Tools::getValue('transactionId');
         $amount = Tools::getValue('amount');
         $userId = Tools::getValue('userId');
         $cartId = - 1;
-
+        
         if (! empty($transactionReference)) {
-
+            
             // extract from transactionReference card id.
             $cartId = intval(substr($transactionReference, strrpos($transactionReference, ' ') + 1));
             $cart = new Cart(intval($cartId));
         } else {
             $cart = null;
         }
-
+        
         if (empty($operation) || empty($transactionReference) || empty($transactionId) || empty($amount) || empty($userId)) {
-
+            
             $result = 'nok Not all parameters set';
         } elseif (empty($cart)) {
-
+            
             $result = 'nok Shopping cart is empty';
         } elseif ($operation == 'VALIDATE') {
-
+            
             $cartTotal = $cart->getOrderTotal();
             $amountFloat = (int) $amount / 100;
-
+            
             $initLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'INIT');
             if (empty($initLog) || empty($initLog->getTransactionReference())) {
-
+                
                 $result = 'nok Transaction not initialized';
             } elseif (($initLog->getTransactionReference() == $transactionReference) || (bccomp($cartTotal, $amountFloat, 4) == 0) || (bccomp($initLog->getAmount(), $cartTotal, 4) == 0)) {
-
+                
                 $validateLog = new DigicashOperationLog();
                 $validateLog->setCartId($cart->id);
                 $validateLog->setTransactionReference($transactionReference);
@@ -86,12 +85,12 @@ class PaymentDigicashCallbackModuleFrontController extends ModuleFrontController
             }
             
         } elseif ($operation == 'CONFIRM') {
-
+            
             $initLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'INIT');
             $validateLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'VALIDATE');
-
+            
             if (empty($initLog) || empty($initLog->getTransactionReference()) || (empty($validateLog) || empty($validateLog->getTransactionReference()))) {
-
+                
                 $amountFloat = intval($amount) % 100;
                 $confirmLog = new DigicashOperationLog();
                 $confirmLog->setCartId($cart->id);
@@ -109,7 +108,7 @@ class PaymentDigicashCallbackModuleFrontController extends ModuleFrontController
         } else {
             $result = 'nok Wrong request';
         }
-
+        
         header('Content-Type: text/plain');
         echo $result;
         exit();
