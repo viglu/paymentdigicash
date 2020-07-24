@@ -35,16 +35,11 @@ class PaymentDigicashDesktopModuleFrontController extends ModuleFrontController
     
     public function initContent()
     {
-        parent::initContent();
-        
-        if ($this->context->isMobile()) {
-            header('Location: ' . $this->context->link->getModuleLink('paymentdigicash', 'mobile', array(), Tools::usingSecureMode()));
-            die();
-        }
+        parent::initContent(); 
         
         $cart = $this->context->cart;
         
-        $operation = 'INIT';
+        $operation = 'INIT'; 
         $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . strval($cart->id);
         $urlAlias = Configuration::get(DigicashConst::URL_ALIAS);
         
@@ -58,6 +53,11 @@ class PaymentDigicashDesktopModuleFrontController extends ModuleFrontController
             $initLog->setAmount($cart->getOrderTotal());
             $initLog->setDateAdd(date("Y-m-d H:i:s"));
             $initLog->add();
+        }
+        
+        if ($this->context->isMobile()) {
+            header('Location: ' . $this->context->link->getModuleLink('paymentdigicash', 'mobile', array(), Tools::usingSecureMode()));
+            die();
         }
         
         $amount = strval(intval($initLog->getAmount() * 100));
