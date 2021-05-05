@@ -2,8 +2,8 @@
 <module>
     <name>paymentdigicash</name>
     <displayName><![CDATA[Digicash by Payconiq]]></displayName>
-    <version><![CDATA[1.0.0]]></version>
-    <description><![CDATA[Digicash is only available in Luxembourg]]></description>
+    <version><![CDATA[1.1.0]]></version>
+    <description><![CDATA[DIGICASH is a mobile banking payment solution that allows you to pay in the store, on the internet or in apps on your mobile. You can use the app to pay your bills and transfer money to friends and family. Payments are made directly from your bank account, immediately and safely.]]></description>
     <author><![CDATA[Luc Vigato]]></author>
     <tab><![CDATA[payments_gateways]]></tab>
     <is_configurable>1</is_configurable>

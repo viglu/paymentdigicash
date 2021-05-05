@@ -31,26 +31,26 @@ require_once dirname(__FILE__) . '/../../classes/DigicashConst.php';
  */
 class PaymentDigicashMobileModuleFrontController extends ModuleFrontController
 {
-    
+
     public function initContent()
     {
         parent::initContent();
-        
+
+        session_start();
+
         $scheme = Tools::getValue('scheme');
-        
-        $cart = $this->context->cart;
-        
-        $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . strval($cart->id);
+
+        $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . $_SESSION['PAYMENTDIGICASH_ORDERREF'];
         $urlAlias = Configuration::get(DigicashConst::URL_ALIAS);
         $merchantId = Configuration::get(DigicashConst::MERCHANT_ID);
-        
+
         $initLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'INIT');
         if (! empty($initLog) || ! empty($initLog->getTransactionReference())) {
             // open the appropriated app
             if (! empty($scheme)) {
-                
+
                 $amount = strval(intval($initLog->getAmount() * 100));
-                
+
                 $appURL = $scheme . '://doPay?merchantId=' . $merchantId . '&amount=' . $amount . '&transactionReference=' . urlencode($initLog->getTransactionReference());
                 if (! empty($urlAlias)) {
                     $appURL .= '&urlAlias=' . $urlAlias;
@@ -59,12 +59,11 @@ class PaymentDigicashMobileModuleFrontController extends ModuleFrontController
                 die();
             }
         }
-        
-        
+
         $schemeList = json_decode(file_get_contents('https://static.digica.sh/resources/apps-ttl.json'));
         $transactionStatusURL = $this->context->link->getModuleLink('paymentdigicash', 'transactionstatus', array(), Tools::usingSecureMode());
         $validationURL = $this->context->link->getModuleLink('paymentdigicash', 'validation', array(), Tools::usingSecureMode());
-        
+
         $this->context->smarty->assign([
             'mobileURL' => $this->context->link->getModuleLink('paymentdigicash', 'mobile', array(), Tools::usingSecureMode()),
             'schemeList' => $schemeList->payLoad->schemeList,
@@ -73,10 +72,10 @@ class PaymentDigicashMobileModuleFrontController extends ModuleFrontController
             'transactionStatusURL' => $transactionStatusURL,
             'validationURL' => $validationURL
         ]);
-        
+
         $this->setTemplate('module:paymentdigicash/views/templates/front/mobile.tpl');
     }
-    
+
     public function setMedia()
     {
         parent::setMedia();

@@ -1,7 +1,8 @@
+
 <?php
 
 /*
- * 2020 Luc Vigato
+ * 2021 Luc Vigato
  *
  * NOTICE OF LICENSE
  *
@@ -23,37 +24,45 @@
  * @copyright 2020 Luc Vigato
  * @license http://opensource.org/licenses/afl-3.0.php Academic Free License (AFL 3.0)
  */
+require_once dirname(__FILE__) . '/../../classes/DigicashConst.php';
 
 /**
  *
  * @since 1.0.0
  */
-class PaymentDigicashTransactionstatusModuleFrontController extends ModuleFrontController
+class PaymentDigicashInitModuleFrontController extends ModuleFrontController
 {
 
     public function initContent()
     {
         parent::initContent();
-        session_start();
-        header('Content-Type: application/json');
 
-        $result = array();
-        $result['status'] = 'ko';
-        $result['message'] = 'Internal error';
+        session_start();
+
+        do {
+            $reference = Order::generateReference();
+        } while (Order::getByReference($reference)->count());
+        $_SESSION['PAYMENTDIGICASH_ORDERREF'] = $reference;
 
         $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . $_SESSION['PAYMENTDIGICASH_ORDERREF'];
+        $cart = $this->context->cart;
 
-        // check if transaction is already validated
-        $log = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'VALIDATE');
-        if (empty($log) || empty($log->getTransactionReference())) {
-            $result['status'] = 'ko';
-            $result['message'] = 'Transaction not validated yet';
-        } else {
-            $result['status'] = 'ok';
-            $result['message'] = 'Transaction validated';
-        }
+        $initLog = new DigicashOperationLog();
+        $initLog->setCartId($cart->id);
+        $initLog->setTransactionReference($transactionReference);
+        $initLog->setOperation('INIT');
+        $initLog->setAmount($cart->getOrderTotal());
+        $initLog->setDateAdd(date("Y-m-d H:i:s"));
+        $initLog->add();
 
-        echo json_encode($result);
+        $pageToView = $this->context->isMobile() ? 'mobile' : 'desktop';
+
+        header('Location: ' . $this->context->link->getModuleLink('paymentdigicash', $pageToView, array(), Tools::usingSecureMode()));
         exit();
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
     }
 }

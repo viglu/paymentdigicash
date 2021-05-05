@@ -34,7 +34,7 @@ class DigicashInstall
 			CREATE TABLE IF NOT EXISTS ' . _DB_PREFIX_ . 'ps_digicash_operation_log(
 			  id int unsigned NOT NULL AUTO_INCREMENT,
 			  id_cart int unsigned NOT NULL,
-		          id_order int unsigned,
+		      id_order int unsigned,
 			  transaction_reference varchar(255) NOT NULL,
 			  operation varchar(12) NOT NULL,
 			  transaction_id varchar(255),

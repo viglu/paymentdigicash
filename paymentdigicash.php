@@ -335,7 +335,7 @@ class paymentdigicash extends PaymentModule
     {
         $iframeOption = new PaymentOption();
         $iframeOption->setCallToActionText($this->l(''))
-            ->setAction($this->context->link->getModuleLink($this->name, 'desktop', array(), true))
+            ->setAction($this->context->link->getModuleLink($this->name, 'init', array(), true))
             ->setAdditionalInformation($this->context->smarty->fetch('module:paymentdigicash/views/templates/front/payment_infos.tpl'))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/payment.png'));
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * 2020 Luc Vigato
  *
@@ -31,4 +32,4 @@ class DigicashConst
 
     public const DESCRIPTION_STATEMENT_PREFIX = 'DIGICASH_DESCRIPTION_STATEMENT_PREFIX';
 }
- 
+
