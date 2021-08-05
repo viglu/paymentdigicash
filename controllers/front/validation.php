@@ -47,31 +47,6 @@ class PaymentDigicashValidationModuleFrontController extends ModuleFrontControll
 
         $cart = $this->context->cart;
 
-        $this->module->currentOrder = $_SESSION['PAYMENTDIGICASH_ORDERREF'];
-
-        $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . $_SESSION['PAYMENTDIGICASH_ORDERREF'];
-        $validateLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'VALIDATE');
-        $confirmLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'CONFIRM');
-        if (! empty($validateLog) && ! empty($confirmLog) /* && empty($cart->id) */) {
-            $orderCart = new Cart($confirmLog->getCartId());
-            $orderCustomer = new Customer($orderCart->id_customer);
-            $redirect_url = 'index.php?controller=order-confirmation&id_cart=' . $confirmLog->getCartId() . '&id_module=' . $this->module->id . '&id_order=' . $this->module->currentOrder . '&key=' . $orderCustomer->secure_key;
-
-            if (self::DEBUG_MODE) {
-                syslog(LOG_WARNING, "Order already confirmed redirect to order-confirmation = " . $redirect_url);
-                closelog();
-            }
-
-            Tools::redirect($redirect_url);
-            exit();
-        }
-
-        if (self::DEBUG_MODE) {
-            syslog(LOG_WARNING, "cart.id = " . $cart->id);
-            syslog(LOG_WARNING, "this.module.currentOrder = " . $this->module->currentOrder);
-            syslog(LOG_WARNING, "_SESSION.PAYMENTDIGICASH_ORDERREF = " . $_SESSION['PAYMENTDIGICASH_ORDERREF']);
-        }
-
         if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || ! $this->module->active) {
             Tools::redirect('index.php?controller=order&step=1');
         }
@@ -88,11 +63,34 @@ class PaymentDigicashValidationModuleFrontController extends ModuleFrontControll
             die($this->module->l('This payment method is not available.', 'validation'));
         }
 
+        $this->module->currentOrder = $_SESSION['PAYMENTDIGICASH_ORDERREF'];
+
+        $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . $_SESSION['PAYMENTDIGICASH_ORDERREF'];
+        $succussLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'SUCCESS');
+        if (! empty($succussLog)) {
+            $orderCart = new Cart($succussLog->getCartId());
+            $orderCustomer = new Customer($orderCart->id_customer);
+            $redirect_url = 'index.php?controller=order-confirmation&id_cart=' . $succussLog->getCartId() . '&id_module=' . $this->module->id . '&id_order=' . $this->module->currentOrder . '&key=' . $orderCustomer->secure_key;
+
+            if (self::DEBUG_MODE) {
+                syslog(LOG_WARNING, "Order already confirmed redirect to order-confirmation = " . $redirect_url);
+                closelog();
+            }
+
+            Tools::redirect($redirect_url);
+            exit();
+        }
+
+        if (self::DEBUG_MODE) {
+            syslog(LOG_WARNING, "cart.id = " . $cart->id);
+            syslog(LOG_WARNING, "this.module.currentOrder = " . $this->module->currentOrder);
+            syslog(LOG_WARNING, "_SESSION.PAYMENTDIGICASH_ORDERREF = " . $_SESSION['PAYMENTDIGICASH_ORDERREF']);
+        }
+
         // check if Digicash VALIDATE and CONFIRM was received
         $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . $_SESSION['PAYMENTDIGICASH_ORDERREF'];
-        $validateLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'VALIDATE');
-        $confirmLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'CONFIRM');
-        if (empty($validateLog) || empty($validateLog->getTransactionReference()) || empty($confirmLog) || empty($confirmLog->getTransactionReference())) {
+        $successLog = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'SUCCESS');        
+        if (empty($successLog) || empty($successLog->getTransactionReference())) {
             Tools::redirect('index.php?controller=order&step=1');
         }
 
@@ -104,7 +102,7 @@ class PaymentDigicashValidationModuleFrontController extends ModuleFrontControll
             $this->context->customer = new Customer($cart->id_customer);
             $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
             $extra_vars = [
-                'transaction_id' => $confirmLog->getTransactionId()
+                'transaction_id' => $successLog->getTransactionId()
             ];
             $this->module->validateOrder($cart->id, Configuration::get('PS_OS_PAYMENT'), $total, $this->module->displayName, NULL, $extra_vars, (int) $cart->id_currency, false, $this->context->customer->secure_key, null, $_SESSION['PAYMENTDIGICASH_ORDERREF']);
         }

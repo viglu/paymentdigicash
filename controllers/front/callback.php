@@ -132,6 +132,16 @@ class PaymentDigicashCallbackModuleFrontController extends ModuleFrontController
                 "transaction_id" => $confirmLog->getTransactionId()
             ];
             $this->module->validateOrder($cart->id, Configuration::get('PS_OS_PAYMENT'), $total, $this->module->displayName, NULL, $extra_vars, (int) $cart->id_currency, false, $this->context->customer->secure_key, null, $order_ref);
+            
+            $successLog = new DigicashOperationLog();
+            $successLog->setTransactionReference($confirmLog->getTransactionReference());
+            $successLog->setOperation('SUCCESS');
+            $successLog->setTransactionId($confirmLog->getTransactionId());
+            $successLog->setAmount($confirmLog->getAmount());
+            $successLog->setUserId($confirmLog->getUserId());
+            $successLog->setDateAdd(date("Y-m-d H:i:s"));
+            $successLog->setCartId($confirmLog->getCartId());
+            $successLog->add();
         }
     }
 }

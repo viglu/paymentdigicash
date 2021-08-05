@@ -43,8 +43,8 @@ class PaymentDigicashTransactionstatusModuleFrontController extends ModuleFrontC
 
         $transactionReference = strval(Configuration::get(DigicashConst::DESCRIPTION_STATEMENT_PREFIX)) . ' ' . $_SESSION['PAYMENTDIGICASH_ORDERREF'];
 
-        // check if transaction is already validated
-        $log = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'VALIDATE');
+        // check if transaction is already validated                          
+        $log = DigicashOperationLog::getLogByRefAndOp($transactionReference, 'SUCCESS');
         if (empty($log) || empty($log->getTransactionReference())) {
             $result['status'] = 'ko';
             $result['message'] = 'Transaction not validated yet';
